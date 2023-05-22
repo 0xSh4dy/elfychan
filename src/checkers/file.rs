@@ -1,16 +1,12 @@
-use std::fs::File;
+use std::{fs::File,io::{Error, Read}};
 
-pub fn check_file(filename:&str)->(bool,String){
-    let result = File::open(filename);
-    let mut error_status =false;
-    let mut error_message = String::new();
-    match result{
-        Ok(_)=>{
-        }
-        Err(_)=>{
-            error_status = true;
-            error_message = format!("Failed to open {}",filename);
-        }
-    }
-    return (error_status,error_message);
+pub fn open_file(filename:&str)->Result<File,Error>{
+    let result: Result<File, std::io::Error> = File::open(filename);
+    return result;
+}
+
+pub fn read_file(mut file:File)->Vec<u8>{
+    let mut buffer:Vec<u8> = Vec::new();
+    file.read_to_end(&mut buffer);
+    return buffer;
 }
