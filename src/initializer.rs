@@ -8,7 +8,8 @@ pub fn initialize(filename:&str){
         match result{
             Ok(file)=>{
                 let buffer:Vec<u8> = checkers::file::read_file(file);
-                elfutils::parser::parse_elf_header(buffer);
+                elfutils::parser::parse_elf_header(&buffer);
+                elfutils::parser::parse_program_headers(&buffer);
             },
             Err(_)=>{
 

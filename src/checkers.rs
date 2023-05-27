@@ -9,7 +9,7 @@ pub fn initial_check(filename: &str)->bool {
     match result {
         Ok(file) => {
             let buffer:Vec<u8> = file::read_file(file);
-            let magic_bytes_option = buffer.get(0..16);
+            let magic_bytes_option = buffer.get(0..3);
             match magic_bytes_option{
                 Some(magic_bytes)=>{
                     if header::check_magic_header(magic_bytes){

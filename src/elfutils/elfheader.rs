@@ -280,4 +280,31 @@ impl elfychan_new_header{
     pub fn parse_entrypoint(&self){
         println!("Entrypoint -> {:#x}", self.eentry);
     }
+    pub fn parse_ephoff(&self){
+        println!("Start of program headers -> {}",self.ephoff);
+    }
+    pub fn parse_eshoff(&self){
+        println!("Start of section headers -> {}",self.eshoff);
+    }
+    pub fn parse_eflags(&self){
+        println!("Processor-specific flags-> {}",self.eflags);
+    }
+    pub fn parse_ehsize(&self){
+        println!("Size of ELF header -> {}",self.eehsize);
+    }
+    pub fn parse_ephentsize(&self){
+        println!("Size of program headers -> {}",self.ephentsize);
+    }
+    pub fn parse_ephnum(&self){
+        println!("No. of program headers -> {}",self.ephnum);
+    }
+    pub fn parse_eshsize(&self){
+        println!("Size of section headers -> {}",self.eshentsize);
+    }
+    pub fn parse_eshnum(&self){
+        println!("No. of section headers -> {}",self.eshnum);
+    }
+    pub fn parse_eshstrndx(&self){
+        println!("Index of section header string table -> {}",self.eshstrndx);
+    }
 }
