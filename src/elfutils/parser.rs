@@ -1,15 +1,18 @@
 extern crate colored;
 extern crate goblin;
-use crate::common::colors::{elfychan_printerr, elfychan_printcyan, elfychan_printgreen};
+use crate::common::colors::{elfychan_printerr, elfychan_printcyan, elfychan_printgreen, elfychan_printinfo};
 use crate::elfutils::{
     elfheader::{elfychan_ident, elfychan_new_header},
     progheaders::parse_program_header,
 };
 use colored::Colorize;
 use goblin::elf::program_header::ProgramHeader;
-use goblin::elf::Elf;
+use goblin::elf::section_header::SectionHeader;
+use goblin::elf::{Elf};
 use goblin::elf::Header;
 use std::mem;
+
+use super::secheaders;
 
 pub fn parse_elf_header(buffer: &Vec<u8>) {
     let result: Result<Header, goblin::error::Error> = Elf::parse_header(&buffer);
@@ -76,6 +79,15 @@ fn get_progheader_info(buffer: &Vec<u8>) -> (u16, u64, bool) {
     return (0, 0, true);
 }
 
+fn get_secheader_info(buffer:&Vec<u8>)->(u16,u64,bool){
+    let result = Elf::parse_header(buffer);
+    if result.is_ok(){
+        let val = result.unwrap();
+        return (val.e_shnum,val.e_shoff,false);
+    }
+    return (0,0,true);
+}
+
 pub fn parse_program_headers(buffer: &Vec<u8>) {
     let container = goblin::container::CONTAINER;
     let ctx = goblin::container::Ctx::new(container, goblin::container::Endian::Little);
@@ -97,11 +109,35 @@ pub fn parse_program_headers(buffer: &Vec<u8>) {
             }
         }
         Err(_) => {
-            elfychan_printerr("Failed to parse ELF header");
+            elfychan_printerr("Failed to parse program headers");
         }
     }
 }
 
+pub fn parse_section_headers(buffer:&Vec<u8>){
+    let container = goblin::container::CONTAINER;
+    let ctx = goblin::container::Ctx::new(container, goblin::container::Endian::Little);
+    let sh_info = get_secheader_info(buffer);
+    let shnum = sh_info.0;
+    let shoff = sh_info.1;
+    let err = sh_info.2;
+    if err{
+        elfychan_printerr("Failed to parse ELF header");
+    }
+    let result = SectionHeader::parse(buffer, shoff as usize, shnum as usize, ctx);
+    elfychan_printgreen("-----------Section Headers-------------");
+    match result{
+        Ok(headers)=>{
+            for header in headers{
+                elfychan_printinfo("--------------------------------");
+                secheaders::parse_section_header(header);
+            }
+        },
+        Err(_)=>{
+            elfychan_printerr("Failed to parse section headers");
+        }
+    }
+}
 fn print_magic(buffer: &Vec<u8>) {
     print!("Magic -> ");
     for i in 0..16 {
